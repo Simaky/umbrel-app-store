@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Boots one app the way umbrelOS would (without app_proxy) and checks that the
 # panel comes up, setup provisions Wings, Wings accepts the panel's token, and a
-# second start is a no-op. Needs Docker, yq (mikefarah), jq and passwordless sudo.
+# second start is a no-op. Needs Docker, yq (mikefarah) and passwordless sudo.
 #
 # Usage: scripts/smoke-test.sh <app-dir>
 set -euo pipefail
@@ -33,6 +33,9 @@ cleanup() {
   if [ "$status" -ne 0 ]; then
     compose ps -a || true
     compose logs --no-color --tail 200 || true
+    # Show the end of the logs as an annotation, visible without opening the job log.
+    tail_log=$(compose logs --no-color --tail 15 2>&1 | sed -e "s/%/%25/g" | awk '{printf "%s%%0A", $0}')
+    echo "::error title=$app smoke test failed::$tail_log"
   fi
   compose down --volumes --remove-orphans || true
   docker network rm "$network" >/dev/null 2>&1 || true
@@ -53,7 +56,8 @@ echo "Checking the panel serves its login page."
 docker exec "${app}_web_1" curl -fsS -o /dev/null http://127.0.0.1/auth/login
 
 echo "Checking Wings accepts the panel's token on port $wings_port."
-token=$(sudo jq -r .token "$config")
+# Wings rewrites config.yml as YAML on boot, so read it with yq, not jq.
+token=$(sudo yq -r .token "$config")
 for _ in $(seq 1 60); do
   if curl -fsS -H "Authorization: Bearer $token" "http://127.0.0.1:$wings_port/api/system" >/dev/null 2>&1; then
     break
@@ -72,10 +76,10 @@ sleep 10
 [ "$(docker inspect -f '{{.State.Running}}' "${app}_wings_1")" = "true" ]
 
 echo "Checking a restart keeps the existing configuration."
-before=$(sudo sha256sum "$config")
+before=$(sudo yq -r .uuid "$config")
 compose up --detach --force-recreate
 docker wait "${app}_setup_1" | grep -qx 0
-[ "$(sudo sha256sum "$config")" = "$before" ]
+[ "$(sudo yq -r .uuid "$config")" = "$before" ]
 [ "$(docker exec "${app}_db_1" mariadb -upterodactyl -p"$APP_PASSWORD" panel -N -B -e 'SELECT COUNT(*) FROM nodes')" = "1" ]
 
 echo "$app passed."

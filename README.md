@@ -130,7 +130,7 @@ Run the updater (PowerShell 5.1 or 7):
 ./scripts/update-pterodactyl.ps1 -Pin   # Also re-pin the MariaDB and Redis digests
 ```
 
-Run the smoke test on Linux with Docker, `yq` and `jq`:
+Run the smoke test on Linux with Docker and `yq`:
 
 ```bash
 bash scripts/smoke-test.sh simaky-pterodactyl
