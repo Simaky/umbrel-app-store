@@ -1,0 +1,49 @@
+manifestVersion: 1
+id: simaky-pterodactyl
+category: gaming
+name: Pterodactyl
+version: "1.15.1"
+tagline: Game server management panel with Wings built in
+icon: https://raw.githubusercontent.com/pterodactyl/panel/v1.15.1/public/favicons/android-chrome-512x512.png
+description: >-
+  Pterodactyl is a free, open-source game server management panel. Every game server runs in its own
+  isolated Docker container, and you manage them all from a modern web interface: console, files, SFTP,
+  schedules, backups, databases and sub-users.
+
+
+  This app bundles everything Pterodactyl needs: the Panel, MariaDB, Redis and the Wings daemon. On first
+  start it creates your admin account, a node called "Umbrel" connected to the bundled Wings, and port
+  allocations 25565-25600, so you can create a server right away.
+
+
+  Ports used on your Umbrel:
+
+  - 8745: Panel web interface
+
+  - 8746: Wings API and console websocket
+
+  - 2022: SFTP
+
+  - 25565-25600: game server allocations (add more in Admin > Nodes > Umbrel > Allocation)
+
+
+  ⚠️ Game servers run as containers on your Umbrel's Docker. Watch out for port conflicts with other apps.
+  The node uses the address umbrel.local. If you open the panel by IP or through Tailscale, change the node's
+  FQDN in Admin > Nodes > Umbrel > Settings so the server console can connect.
+
+
+  ⚠️ Stop or delete your game servers in the panel before uninstalling this app.
+releaseNotes: |-
+  Pterodactyl Panel v1.15.1 with Wings v1.13.4.
+developer: Pterodactyl Software
+website: https://pterodactyl.io
+dependencies: []
+repo: https://github.com/pterodactyl/panel
+support: https://github.com/pterodactyl/panel/discussions
+port: 8745
+gallery: []
+path: ""
+defaultUsername: "umbrel"
+deterministicPassword: true
+submitter: Simaky
+submission: https://github.com/Simaky/umbrel-app-store
