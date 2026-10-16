@@ -1,0 +1,28 @@
+name: Test apps
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  smoke-test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        app: [simaky-pterodactyl, simaky-pterodactyl-v2-beta]
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Lint shell scripts
+        run: |
+          shellcheck --severity=warning --shell=sh ${{ matrix.app }}/setup.sh
+          shellcheck --severity=warning scripts/smoke-test.sh
+
+      - name: Check setup scripts are identical
+        run: cmp simaky-pterodactyl/setup.sh simaky-pterodactyl-v2-beta/setup.sh
+
+      - name: Boot the app and check provisioning
+        run: bash scripts/smoke-test.sh ${{ matrix.app }}
