@@ -1,0 +1,54 @@
+manifestVersion: 1
+id: simaky-pterodactyl-v2-beta
+category: gaming
+name: Pterodactyl 2 Beta
+version: "2.0.0-beta.2"
+tagline: The Pterodactyl 2.0 open beta, with Wings built in
+icon: https://raw.githubusercontent.com/pterodactyl/panel/v1.15.1/public/favicons/android-chrome-512x512.png
+description: >-
+  ⚠️ Pterodactyl 2.0 is in open beta. Expect bugs, and keep important game servers on the stable
+  Pterodactyl app.
+
+
+  Pterodactyl 2.0 is a rebuilt version of the open-source game server management panel. It adds
+  extensions that survive updates, themes with dark and light modes, a unified admin area, a one-click egg
+  catalog, tags for eggs and nodes, and a console that works on phones.
+
+
+  This app bundles everything Pterodactyl needs: the Panel, MariaDB, Redis and the Wings daemon. On first
+  start it creates your admin account, a node called "Umbrel" connected to the bundled Wings, and port
+  allocations 26565-26600, so you can create a server right away. It can be installed next to the stable
+  Pterodactyl app.
+
+
+  Ports used on your Umbrel:
+
+  - 8755: Panel web interface
+
+  - 8756: Wings API and console websocket
+
+  - 2023: SFTP
+
+  - 26565-26600: game server allocations (add more in the node's Allocation settings)
+
+
+  ⚠️ Game servers run as containers on your Umbrel's Docker. Watch out for port conflicts with other apps.
+  The node uses the address umbrel.local. If you open the panel by IP or through Tailscale, change the node's
+  FQDN in the node settings so the server console can connect.
+
+
+  ⚠️ Stop or delete your game servers in the panel before uninstalling this app.
+releaseNotes: |-
+  Pterodactyl Panel v2.0.0-beta.2 with Wings v1.13.4.
+developer: Pterodactyl Software
+website: https://pterodactyl.io
+dependencies: []
+repo: https://github.com/pterodactyl/panel
+support: https://github.com/pterodactyl/panel/discussions
+port: 8755
+gallery: []
+path: ""
+defaultUsername: "umbrel"
+deterministicPassword: true
+submitter: Simaky
+submission: https://github.com/Simaky/umbrel-app-store
