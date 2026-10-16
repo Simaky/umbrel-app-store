@@ -1,0 +1,62 @@
+name: Update Pterodactyl
+
+# GitHub can't trigger on releases in another repository, so poll for them.
+on:
+  schedule:
+    - cron: "17 */3 * * *"
+  workflow_dispatch:
+    inputs:
+      pin:
+        description: Re-resolve all image digests, including MariaDB and Redis
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-pterodactyl
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Check for new Panel and Wings releases
+        id: update
+        shell: pwsh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if ('${{ inputs.pin }}' -eq 'true') {
+            ./scripts/update-pterodactyl.ps1 -Pin
+          } else {
+            ./scripts/update-pterodactyl.ps1
+          }
+
+      - name: Find changed apps
+        id: changed
+        run: |
+          apps=$(git diff --name-only | cut -d/ -f1 | sort -u | tr '\n' ' ')
+          echo "apps=$apps" >> "$GITHUB_OUTPUT"
+          echo "Changed: ${apps:-none}"
+
+      # Only publish versions that actually boot and provision Wings.
+      - name: Smoke-test changed apps
+        if: steps.changed.outputs.apps != ''
+        run: |
+          for app in ${{ steps.changed.outputs.apps }}; do
+            bash scripts/smoke-test.sh "$app"
+          done
+
+      - name: Commit and push
+        if: steps.changed.outputs.apps != ''
+        env:
+          MESSAGE: ${{ steps.update.outputs.message }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "${MESSAGE:-Re-pin image digests}"
+          git push
