@@ -1,10 +1,10 @@
 <#
 .SYNOPSIS
-  Updates the Pterodactyl apps in this store to the latest Panel and Wings releases.
+  Updates the apps in this store to the latest upstream releases.
 
 .DESCRIPTION
-  For each app it finds the newest matching GitHub release of pterodactyl/panel and
-  pterodactyl/wings, checks that the ghcr.io image is published for amd64 and arm64,
+  For each app it finds the newest matching GitHub release (Pterodactyl Panel and Wings,
+  Newt), checks that the image is published for amd64 and arm64,
   pins the image by digest in docker-compose.yml, and bumps version and releaseNotes in
   umbrel-app.yml. Runs on PowerShell 5.1 and 7.
 
@@ -28,15 +28,20 @@ $Apps = @(
     @{ Dir = 'simaky-pterodactyl-v2-beta'; PanelMajor = '2'; WingsMajor = $null; Prerelease = $true }
 )
 
+# Apps that run one upstream image, tagged like its GitHub releases.
+$ImageApps = @(
+    @{ Dir = 'simaky-newt'; Name = 'Newt'; Repo = 'fosrl/newt'; Image = 'fosrl/newt' }
+)
+
 # Third-party images that are pinned by digest but only change when edited by hand.
-$BaseImages = @('mariadb', 'redis')
+$BaseImages = @('mariadb', 'redis', 'busybox')
 
 $Utf8NoBom = New-Object System.Text.UTF8Encoding $false
 
 function Get-Releases([string]$Repo) {
     $headers = @{ 'User-Agent' = 'umbrel-app-store-updater'; 'Accept' = 'application/vnd.github+json' }
     if ($env:GITHUB_TOKEN) { $headers['Authorization'] = "Bearer $($env:GITHUB_TOKEN)" }
-    $uri = "https://api.github.com/repos/pterodactyl/$Repo/releases?per_page=100"
+    $uri = "https://api.github.com/repos/$Repo/releases?per_page=100"
     # The API lists releases newest first. Assign before piping so PowerShell 5.1
     # enumerates the JSON array instead of passing it as one object.
     $releases = Invoke-RestMethod -Uri $uri -Headers $headers
@@ -44,7 +49,8 @@ function Get-Releases([string]$Repo) {
 }
 
 function Select-Release($Releases, [string]$Major, [bool]$Prerelease) {
-    $pattern = if ($Major) { "^v$([regex]::Escape($Major))\." } else { '^v\d' }
+    # Pterodactyl tags start with "v", Fossorial tags don't.
+    $pattern = if ($Major) { "^v?$([regex]::Escape($Major))\." } else { '^v?\d' }
     return $Releases | Where-Object { $_.tag_name -match $pattern -and ($Prerelease -or -not $_.prerelease) } |
         Select-Object -First 1
 }
@@ -106,6 +112,26 @@ function Set-ImageReference([string]$Compose, [string]$Name, [string]$Reference)
     return [regex]::Replace($Compose, $pattern, { param($m) $m.Groups[1].Value + $Reference })
 }
 
+function Test-Image([string]$Compose, [string]$Name) {
+    return [regex]::IsMatch($Compose, "(?m)^\s*image:\s*$([regex]::Escape($Name)):")
+}
+
+function Set-PinnedBaseImages([string]$Compose) {
+    foreach ($name in $BaseImages) {
+        if (Test-Image $Compose $name) {
+            $tag = Get-ImageTag $Compose $name
+            $Compose = Set-ImageReference $Compose $name (Get-PinnedImage "${name}:$tag")
+        }
+    }
+    return $Compose
+}
+
+function Set-ReleaseNotes([string]$Manifest, [string]$Version, [string[]]$Notes) {
+    $block = (($Notes -join "`n").Trim() -split "`n" | ForEach-Object { if ($_) { "  $_" } else { '' } }) -join "`n"
+    $Manifest = [regex]::Replace($Manifest, '(?m)^version:\s*"[^"]*"', "version: `"$Version`"")
+    return [regex]::Replace($Manifest, '(?ms)^releaseNotes:.*?(?=^\S)', { param($m) "releaseNotes: |-`n$block`n" })
+}
+
 function Get-ImageTag([string]$Compose, [string]$Name) {
     $m = [regex]::Match($Compose, "(?m)^\s*image:\s*$([regex]::Escape($Name)):(?<tag>[^\s@]+)")
     if (-not $m.Success) { throw "No $Name image found" }
@@ -118,8 +144,8 @@ function Format-ReleaseBody([string]$Body) {
     return $text
 }
 
-$panelReleases = Get-Releases 'panel'
-$wingsReleases = Get-Releases 'wings'
+$panelReleases = Get-Releases 'pterodactyl/panel'
+$wingsReleases = Get-Releases 'pterodactyl/wings'
 $summary = @()
 
 foreach ($app in $Apps) {
@@ -153,12 +179,7 @@ foreach ($app in $Apps) {
     $compose = Set-ImageReference $compose 'ghcr.io/pterodactyl/panel' $panelRef
     $compose = Set-ImageReference $compose 'ghcr.io/pterodactyl/wings' $wingsRef
 
-    if ($Pin) {
-        foreach ($name in $BaseImages) {
-            $tag = Get-ImageTag $compose $name
-            $compose = Set-ImageReference $compose $name (Get-PinnedImage "${name}:$tag")
-        }
-    }
+    if ($Pin) { $compose = Set-PinnedBaseImages $compose }
 
     if ($panelChanged -or $wingsChanged) {
         $version = [regex]::Match($manifest, '(?m)^version:\s*"(?<v>[^"]+)"').Groups['v'].Value
@@ -177,10 +198,7 @@ foreach ($app in $Apps) {
         if ($wingsChanged) {
             $notes += "Wings $($wings.tag_name):", (Format-ReleaseBody $wings.body), '', $wings.html_url, ''
         }
-        $block = (($notes -join "`n").Trim() -split "`n" | ForEach-Object { if ($_) { "  $_" } else { '' } }) -join "`n"
-
-        $manifest = [regex]::Replace($manifest, '(?m)^version:\s*"[^"]*"', "version: `"$version`"")
-        $manifest = [regex]::Replace($manifest, '(?ms)^releaseNotes:.*?(?=^\S)', { param($m) "releaseNotes: |-`n$block`n" })
+        $manifest = Set-ReleaseNotes $manifest $version $notes
 
         $summary += "$($app.Dir) $version (panel $($panel.tag_name), wings $($wings.tag_name))"
     }
@@ -188,6 +206,43 @@ foreach ($app in $Apps) {
     [IO.File]::WriteAllText($composePath, $compose, $Utf8NoBom)
     [IO.File]::WriteAllText($manifestPath, $manifest, $Utf8NoBom)
     Write-Host "$($app.Dir): panel $currentPanel -> $($panel.tag_name), wings $currentWings -> $($wings.tag_name)"
+}
+
+foreach ($app in $ImageApps) {
+    $composePath = Join-Path $Root "$($app.Dir)/docker-compose.yml"
+    $manifestPath = Join-Path $Root "$($app.Dir)/umbrel-app.yml"
+    $compose = [IO.File]::ReadAllText($composePath)
+    $manifest = [IO.File]::ReadAllText($manifestPath)
+
+    $release = Select-Release (Get-Releases $app.Repo) $null $false
+    if (-not $release) { throw "No releases found for $($app.Repo)" }
+    $current = Get-ImageTag $compose $app.Image
+    $changed = $current -ne $release.tag_name
+
+    if (-not ($changed -or $Pin)) {
+        Write-Host "$($app.Dir): up to date ($current)"
+        continue
+    }
+
+    try {
+        $ref = Get-PinnedImage "$($app.Image):$($release.tag_name)"
+    } catch {
+        Write-Warning "$($app.Dir): skipping, $($_.Exception.Message)"
+        continue
+    }
+    $compose = Set-ImageReference $compose $app.Image $ref
+    if ($Pin) { $compose = Set-PinnedBaseImages $compose }
+
+    if ($changed) {
+        $version = $release.tag_name.TrimStart('v')
+        $notes = @("$($app.Name) $($release.tag_name).", '', (Format-ReleaseBody $release.body), '', $release.html_url)
+        $manifest = Set-ReleaseNotes $manifest $version $notes
+        $summary += "$($app.Dir) $version"
+    }
+
+    [IO.File]::WriteAllText($composePath, $compose, $Utf8NoBom)
+    [IO.File]::WriteAllText($manifestPath, $manifest, $Utf8NoBom)
+    Write-Host "$($app.Dir): $current -> $($release.tag_name)"
 }
 
 if ($env:GITHUB_OUTPUT) {

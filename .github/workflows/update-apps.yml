@@ -1,4 +1,4 @@
-name: Update Pterodactyl
+name: Update apps
 
 # GitHub can't trigger on releases in another repository, so poll for them.
 on:
@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       pin:
-        description: Re-resolve all image digests, including MariaDB and Redis
+        description: Re-resolve all image digests, including MariaDB, Redis and BusyBox
         type: boolean
         default: false
 
@@ -15,7 +15,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: update-pterodactyl
+  group: update-apps
   cancel-in-progress: false
 
 jobs:
@@ -24,16 +24,16 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - name: Check for new Panel and Wings releases
+      - name: Check for new releases
         id: update
         shell: pwsh
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           if ('${{ inputs.pin }}' -eq 'true') {
-            ./scripts/update-pterodactyl.ps1 -Pin
+            ./scripts/update-apps.ps1 -Pin
           } else {
-            ./scripts/update-pterodactyl.ps1
+            ./scripts/update-apps.ps1
           }
 
       - name: Find changed apps
@@ -43,7 +43,7 @@ jobs:
           echo "apps=$apps" >> "$GITHUB_OUTPUT"
           echo "Changed: ${apps:-none}"
 
-      # Only publish versions that actually boot and provision Wings.
+      # Only publish versions that actually boot and pass their smoke test.
       - name: Smoke-test changed apps
         if: steps.changed.outputs.apps != ''
         run: |
