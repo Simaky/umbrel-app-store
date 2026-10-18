@@ -1,0 +1,32 @@
+version: "3.7"
+
+services:
+  app_proxy:
+    environment:
+      APP_HOST: simaky-newt_web_1
+      APP_PORT: 8080
+      # Keep the umbrelOS login in front of the setup page: it holds the site secret.
+
+  # Setup page where you paste the site details from Pangolin.
+  web:
+    image: busybox:1.37@sha256:bdf57e528e45e4433820e045b29b4597825a1c9e38353532d90a01445013f82e
+    user: "1000:1000"
+    restart: on-failure
+    command: ["httpd", "-f", "-v", "-p", "8080", "-h", "/www"]
+    volumes:
+      - ${APP_DATA_DIR}/www:/www:ro
+      - ${APP_DATA_DIR}/data:/data
+
+  newt:
+    image: fosrl/newt:1.18.1@sha256:7fed6605e0a104a337e1cb903bbb1225f80c7f6e5e56ff1eb1d70c57740d8e0f
+    restart: on-failure
+    stop_grace_period: 30s
+    # Host networking lets Pangolin resources target localhost:<port>, which
+    # reaches every app and game server published on this Umbrel.
+    network_mode: host
+    entrypoint: ["/bin/sh", "/run-newt.sh"]
+    environment:
+      HEALTH_FILE: /data/run/healthy
+    volumes:
+      - ${APP_DATA_DIR}/run-newt.sh:/run-newt.sh:ro
+      - ${APP_DATA_DIR}/data:/data

@@ -1,0 +1,41 @@
+manifestVersion: 1
+id: simaky-newt
+category: networking
+name: Newt for Pangolin
+version: "1.18.1"
+tagline: Share your Umbrel's apps and game servers through your own Pangolin server
+icon: https://raw.githubusercontent.com/fosrl/pangolin/1.24.0/public/logo/pangolin_orange_512x512.png
+description: >-
+  Newt connects your Umbrel to a Pangolin server, for example one on your VPS. Pangolin then makes your
+  apps and game servers reachable from the internet, with HTTPS and access control, without opening any
+  ports on your home router.
+
+
+  How to set it up:
+
+  1. In Pangolin, open your organization and create a site of type Newt.
+
+  2. Open this app and paste the Pangolin address, site ID and site secret. Newt connects in a few seconds.
+
+  3. In Pangolin, add resources for this site. Use localhost as the target address, for example
+  localhost:25565 for a Minecraft server.
+
+
+  Newt uses host networking, so it can reach every port that apps on this Umbrel publish.
+
+
+  You need your own Pangolin server or Pangolin Cloud. This app only runs the connector.
+releaseNotes: |-
+  Newt 1.18.1.
+developer: Fossorial
+website: https://pangolin.net
+dependencies: []
+repo: https://github.com/fosrl/newt
+support: https://github.com/fosrl/newt/issues
+port: 8767
+gallery: []
+path: ""
+defaultUsername: ""
+defaultPassword: ""
+submitter: Simaky
+submission: https://github.com/Simaky/umbrel-app-store
