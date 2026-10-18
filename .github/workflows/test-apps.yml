@@ -12,17 +12,18 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        app: [simaky-pterodactyl, simaky-pterodactyl-v2-beta]
+        app: [simaky-pterodactyl, simaky-pterodactyl-v2-beta, simaky-newt]
     steps:
       - uses: actions/checkout@v7
 
       - name: Lint shell scripts
         run: |
-          shellcheck --severity=warning --shell=sh ${{ matrix.app }}/setup.sh
-          shellcheck --severity=warning scripts/smoke-test.sh
+          shellcheck --severity=warning --shell=sh $(find ${{ matrix.app }} -name '*.sh' -o -name '*.cgi')
+          shellcheck --severity=warning scripts/*.sh
 
       - name: Check setup scripts are identical
+        if: startsWith(matrix.app, 'simaky-pterodactyl')
         run: cmp simaky-pterodactyl/setup.sh simaky-pterodactyl-v2-beta/setup.sh
 
-      - name: Boot the app and check provisioning
+      - name: Boot the app and run its smoke test
         run: bash scripts/smoke-test.sh ${{ matrix.app }}

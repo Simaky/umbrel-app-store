@@ -7,6 +7,9 @@
 set -euo pipefail
 
 app="${1:?usage: $0 <app-dir>}"
+case "$app" in
+  simaky-newt) exec bash "$(dirname "$0")/smoke-test-newt.sh" "$app" ;;
+esac
 root=$(cd "$(dirname "$0")/.." && pwd)
 work=$(mktemp -d)
 
