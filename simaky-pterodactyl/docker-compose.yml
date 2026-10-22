@@ -42,7 +42,7 @@ services:
       retries: 5
 
   web:
-    image: ghcr.io/pterodactyl/panel:v1.15.1@sha256:e27a06cfcd078691ddf9805ae0dee2ee529b35ce18e427ef970de4d503602f2c
+    image: ghcr.io/pterodactyl/panel:v1.15.2@sha256:cd7cda1727f110cee375ed52a95adfe73065548576715e7b92f8c899558271e3
     restart: on-failure
     stop_grace_period: 1m
     depends_on:
@@ -83,7 +83,7 @@ services:
       retries: 5
 
   setup:
-    image: ghcr.io/pterodactyl/panel:v1.15.1@sha256:e27a06cfcd078691ddf9805ae0dee2ee529b35ce18e427ef970de4d503602f2c
+    image: ghcr.io/pterodactyl/panel:v1.15.2@sha256:cd7cda1727f110cee375ed52a95adfe73065548576715e7b92f8c899558271e3
     restart: "no"
     entrypoint: ["/bin/ash", "/umbrel-setup.sh"]
     depends_on:

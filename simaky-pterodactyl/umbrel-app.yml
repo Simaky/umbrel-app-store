@@ -2,7 +2,7 @@ manifestVersion: 1
 id: simaky-pterodactyl
 category: gaming
 name: Pterodactyl
-version: "1.15.1"
+version: "1.15.2"
 tagline: Game server management panel with Wings built in
 icon: https://raw.githubusercontent.com/pterodactyl/panel/v1.15.1/public/favicons/android-chrome-512x512.png
 description: >-
@@ -34,7 +34,23 @@ description: >-
 
   ⚠️ Stop or delete your game servers in the panel before uninstalling this app.
 releaseNotes: |-
-  Pterodactyl Panel v1.15.1 with Wings v1.13.4.
+  Pterodactyl Panel v1.15.2 with Wings v1.13.4.
+
+  Panel v1.15.2:
+  security release for php2shell (CVE-2026-109618, CVE-2026-109619)
+
+  - docker image now runs php 8.3.36
+  - docker image disables `session.upload_progress` in php-fpm
+
+  not using docker? update php to 8.2.35 or 8.3.36 and upgrade every php package together:
+
+  ```
+  sudo apt update && sudo apt install --only-upgrade 'php8.*'
+  ```
+
+  **Full Changelog**: https://github.com/pterodactyl/panel/compare/v1.15.1...v1.15.2
+
+  https://github.com/pterodactyl/panel/releases/tag/v1.15.2
 developer: Pterodactyl Software
 website: https://pterodactyl.io
 dependencies: []
