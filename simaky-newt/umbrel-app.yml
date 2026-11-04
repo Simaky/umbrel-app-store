@@ -2,7 +2,7 @@ manifestVersion: 1
 id: simaky-newt
 category: networking
 name: Newt for Pangolin
-version: "1.19.0"
+version: "1.20.0"
 tagline: Share your Umbrel's apps and game servers through your own Pangolin server
 icon: https://raw.githubusercontent.com/fosrl/pangolin/1.24.0/public/logo/pangolin_orange_512x512.png
 description: >-
@@ -26,19 +26,22 @@ description: >-
 
   You need your own Pangolin server or Pangolin Cloud. This app only runs the connector.
 releaseNotes: |-
-  Newt 1.19.0.
+  Newt 1.20.0.
 
   ## Container Images
-  - GHCR: `ghcr.io/fosrl/newt@sha256:0189c8287058b800cca825590e4c39946b3815344ca48678dd0b96616d639319`
-  - Docker Hub: `docker.io/fosrl/newt@sha256:0189c8287058b800cca825590e4c39946b3815344ca48678dd0b96616d639319`
-  **Tag:** `1.19.0`
+  - GHCR: `ghcr.io/fosrl/newt@sha256:2170e673c4c72d905764fa22e83d0ae0aa3239fb1ab3b9fcaefb2b00fffb2d6e`
+  - Docker Hub: `docker.io/fosrl/newt@sha256:2170e673c4c72d905764fa22e83d0ae0aa3239fb1ab3b9fcaefb2b00fffb2d6e`
+  **Tag:** `1.20.0`
+
 
   ## What's Changed
-  * Add support for client identities in private resource HTTP requests
+  * Support ssh logging
+  * Fix auto update on Windows
 
-  **Full Changelog**: https://github.com/fosrl/newt/compare/v1.19.0...1.19.0
 
-  https://github.com/fosrl/newt/releases/tag/1.19.0
+  **Full Changelog**: https://github.com/fosrl/newt/compare/1.19.1...1.20.0
+
+  https://github.com/fosrl/newt/releases/tag/1.20.0
 developer: Fossorial
 website: https://pangolin.net
 dependencies: []
