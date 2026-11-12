@@ -2,7 +2,7 @@ manifestVersion: 1
 id: simaky-pterodactyl-v2-beta
 category: gaming
 name: Pterodactyl 2 Beta
-version: "2.0.0-beta.2"
+version: "2.0.0-beta.2-patch.1"
 tagline: The Pterodactyl 2.0 open beta, with Wings built in
 icon: https://raw.githubusercontent.com/pterodactyl/panel/v1.15.1/public/favicons/android-chrome-512x512.png
 description: >-
@@ -39,7 +39,17 @@ description: >-
 
   ⚠️ Stop or delete your game servers in the panel before uninstalling this app.
 releaseNotes: |-
-  Pterodactyl Panel v2.0.0-beta.2 with Wings v1.13.4.
+  Pterodactyl Panel v2.0.0-beta.2 with Wings v1.13.5.
+
+  Wings v1.13.5:
+  ## What's Changed
+  * `wings configure` now takes the node's mounts from the Panel by @SkyMulley in https://github.com/pterodactyl/wings/pull/351
+
+  Re-running `wings configure` replaces `allowed_mounts` in `config.yml` with the mounts attached to the node in the Panel. Mounts you added to `config.yml` by hand are removed unless they are also attached to the node. The data directory (`system.data`) is not changed.
+
+  **Full Changelog**: https://github.com/pterodactyl/wings/compare/v1.13.4...v1.13.5
+
+  https://github.com/pterodactyl/wings/releases/tag/v1.13.5
 developer: Pterodactyl Software
 website: https://pterodactyl.io
 dependencies: []

@@ -44,7 +44,7 @@ services:
   # Panel 2.0 never migrates on startup; run it as an explicit step on every
   # app start so updates apply their schema changes before the panel boots.
   migrate:
-    image: ghcr.io/pterodactyl/panel:v2.0.0-beta.2@sha256:b3f1229ab8143615a93d8207096059e9903b5b7868cfb34ae0152d22203618c0
+    image: ghcr.io/pterodactyl/panel:v2.0.0-beta.2@sha256:ca42a412cc7a36d0b579cb3bc620e717f603c46f29275270f23e3ba151f8e87e
     restart: "no"
     command: ["php", "artisan", "migrate", "--seed", "--force", "--isolated=1", "--no-interaction"]
     depends_on:
@@ -74,7 +74,7 @@ services:
       MAIL_MAILER: log
 
   web:
-    image: ghcr.io/pterodactyl/panel:v2.0.0-beta.2@sha256:b3f1229ab8143615a93d8207096059e9903b5b7868cfb34ae0152d22203618c0
+    image: ghcr.io/pterodactyl/panel:v2.0.0-beta.2@sha256:ca42a412cc7a36d0b579cb3bc620e717f603c46f29275270f23e3ba151f8e87e
     restart: on-failure
     # Longer than the queue worker timeout so running jobs can finish.
     stop_grace_period: 90s
@@ -113,7 +113,7 @@ services:
     # The image ships its own HEALTHCHECK; setup waits on it.
 
   setup:
-    image: ghcr.io/pterodactyl/panel:v2.0.0-beta.2@sha256:b3f1229ab8143615a93d8207096059e9903b5b7868cfb34ae0152d22203618c0
+    image: ghcr.io/pterodactyl/panel:v2.0.0-beta.2@sha256:ca42a412cc7a36d0b579cb3bc620e717f603c46f29275270f23e3ba151f8e87e
     restart: "no"
     entrypoint: ["/bin/ash", "/umbrel-setup.sh"]
     depends_on:
@@ -158,7 +158,7 @@ services:
       WINGS_NETWORK_GATEWAY_V6: fdba:17c8:6c95::1011
 
   wings:
-    image: ghcr.io/pterodactyl/wings:v1.13.4@sha256:f3eb1fcca035ba94256d612e31315bf33db948693db1a9c4646ce398aefc2f1b
+    image: ghcr.io/pterodactyl/wings:v1.13.5@sha256:6d0a513d1999e2d7930dde3fffb78fb80f38e0413452d28f64320c54f11be056
     restart: on-failure
     stop_grace_period: 1m
     depends_on:
