@@ -2,7 +2,7 @@ manifestVersion: 1
 id: simaky-pterodactyl-v2-beta
 category: gaming
 name: Pterodactyl 2 Beta
-version: "2.0.0-beta.2-patch.1"
+version: "2.0.0-beta.3"
 tagline: The Pterodactyl 2.0 open beta, with Wings built in
 icon: https://raw.githubusercontent.com/pterodactyl/panel/v1.15.1/public/favicons/android-chrome-512x512.png
 description: >-
@@ -39,17 +39,33 @@ description: >-
 
   ⚠️ Stop or delete your game servers in the panel before uninstalling this app.
 releaseNotes: |-
-  Pterodactyl Panel v2.0.0-beta.2 with Wings v1.13.5.
+  Pterodactyl Panel v2.0.0-beta.3 with Wings v1.13.5.
 
-  Wings v1.13.5:
-  ## What's Changed
-  * `wings configure` now takes the node's mounts from the Panel by @SkyMulley in https://github.com/pterodactyl/wings/pull/351
+  Panel v2.0.0-beta.3:
+  ### Fixed
+  * The Docker image builds on PHP 8.4.27 and runs PHP-FPM with `session.upload_progress.enabled=0` (CVE-2026-109618, CVE-2026-109619).
+  * The Docker image builds on Alpine 3.24, which ships nginx 1.30.7 (CVE-2026-123007, CVE-2026-123633).
+  * An expired session, such as after a password change, sends you to the login page and back to where you were.
+  * Files with an empty MIME type and a size of 0 or 4096 bytes upload instead of being rejected as folders.
+  * The console resizes, selects words and opens links reliably.
+  * The file editor highlights nested YAML, selections and search matches correctly.
+  * Modals on narrow screens keep the page layout intact.
+  * Files over the node's upload limit are refused before the upload starts.
+  * The file editor's find and replace fields update on paste and every other edit, not only on key presses.
 
-  Re-running `wings configure` replaces `allowed_mounts` in `config.yml` with the mounts attached to the node in the Panel. Mounts you added to `config.yml` by hand are removed unless they are also attached to the node. The data directory (`system.data`) is not changed.
+  ### Added
+  * Adds custom user avatars, managed from the account page and by admins.
+  * Adds a copy button for the startup command.
+  * Adds the `ReplacesUserAvatars` action contract. `user-avatars` is a reserved extension id.
+  * Adds a panel logo, uploaded from the general settings, shown as the favicon, on the login page and in place of the company name. A theme's own logo takes its place.
+  * Adds the `ReplacesBrandLogo` action contract. `panel-logo` is a reserved extension id.
+  * Adds a button to generate a secure password, and `generateSecurePassword`, `PasswordInput` and `FieldModel.setValue` to the SDK.
 
-  **Full Changelog**: https://github.com/pterodactyl/wings/compare/v1.13.4...v1.13.5
+  ### Changed
+  * Subuser permission cards a
+  ...
 
-  https://github.com/pterodactyl/wings/releases/tag/v1.13.5
+  https://github.com/pterodactyl/panel/releases/tag/v2.0.0-beta.3
 developer: Pterodactyl Software
 website: https://pterodactyl.io
 dependencies: []
