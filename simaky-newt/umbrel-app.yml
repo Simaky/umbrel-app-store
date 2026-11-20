@@ -2,7 +2,7 @@ manifestVersion: 1
 id: simaky-newt
 category: networking
 name: Newt for Pangolin
-version: "1.20.0"
+version: "1.20.1"
 tagline: Share your Umbrel's apps and game servers through your own Pangolin server
 icon: https://raw.githubusercontent.com/fosrl/pangolin/1.24.0/public/logo/pangolin_orange_512x512.png
 description: >-
@@ -26,22 +26,30 @@ description: >-
 
   You need your own Pangolin server or Pangolin Cloud. This app only runs the connector.
 releaseNotes: |-
-  Newt 1.20.0.
+  Newt 1.20.1.
 
   ## Container Images
-  - GHCR: `ghcr.io/fosrl/newt@sha256:2170e673c4c72d905764fa22e83d0ae0aa3239fb1ab3b9fcaefb2b00fffb2d6e`
-  - Docker Hub: `docker.io/fosrl/newt@sha256:2170e673c4c72d905764fa22e83d0ae0aa3239fb1ab3b9fcaefb2b00fffb2d6e`
-  **Tag:** `1.20.0`
+  - GHCR: `ghcr.io/fosrl/newt@sha256:03561e3f3d10b94ee7839318ae46e5acf8b4431550ea1d0e15666ab60caa2e43`
+  - Docker Hub: `docker.io/fosrl/newt@sha256:03561e3f3d10b94ee7839318ae46e5acf8b4431550ea1d0e15666ab60caa2e43`
+  **Tag:** `1.20.1`
 
 
   ## What's Changed
-  * Support ssh logging
-  * Fix auto update on Windows
+  * Add `--local-endpoints` to list IPs for local connections to try
+  * Fix keep the physical socket receive routine alive after read errors top prevent disconnections on MacOS
+  * Fix ICMP echo replies for alias resources to come from the pinged address
+  * Fix turn off gVisor's RACK which stalls downloads after packet loss (enable again with --enable-tcp-rack)
+  * Fix telemetry not enableable on CLI
 
+  ## New Contributors
+  * @Fxnarji made their first contribution in https://github.com/fosrl/newt/pull/478
+  * @dingyifei made their first contribution in https://github.com/fosrl/newt/pull/480
+  * @rskallies made their first contribution in https://github.com/fosrl/newt/pull/483
+  * @adios-404 made their first contribution in https://github.com/fosrl/newt/pull/476
 
-  **Full Changelog**: https://github.com/fosrl/newt/compare/1.19.1...1.20.0
+  **Full Changelog**: https://github.com/fosrl/newt/compare/1.20.0...1.20.1
 
-  https://github.com/fosrl/newt/releases/tag/1.20.0
+  https://github.com/fosrl/newt/releases/tag/1.20.1
 developer: Fossorial
 website: https://pangolin.net
 dependencies: []
